@@ -10,8 +10,9 @@ fi
 
 # Add user to system and apache basic auth
 groupadd ood
-useradd --create-home --gid ood ood
+useradd -u 1001 --create-home --gid ood ood
 echo -n "ood" | passwd --stdin ood
 
 sed -i 's/^PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-systemctl restart sshd
+# systemctl restart sshd
+/etc/init.d/sshd restart

@@ -10,7 +10,7 @@ fi
 
 # Add user to system and apache basic auth
 groupadd ood
-useradd --create-home --gid ood ood
+useradd -u 1001 --create-home --gid ood ood
 echo -n "ood" | passwd --stdin ood
 scl enable httpd24 -- htpasswd -b -c /opt/rh/httpd24/root/etc/httpd/.htpasswd ood ood
 

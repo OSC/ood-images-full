@@ -4,8 +4,8 @@
 yum -y install epel-release
 yum -y install munge munge-devel
 install -o munge -g munge -m 0600 /vagrant/munge.key /etc/munge/munge.key
-systemctl enable munge
-systemctl start munge
+chkconfig munge on
+/etc/init.d/munge start
 
 # Install SLURM
 yum -y install readline-devel numactl-devel pam-devel glib2-devel hwloc-devel openssl-devel curl-devel libcgroup-devel
@@ -21,11 +21,13 @@ if [ ! -f /opt/slurm/sbin/slurmctld ]; then
     ./configure --prefix=/opt/slurm --sysconfdir=/opt/slurm/etc
     make
     make install
-    install -D -m644 etc/slurmctld.service /etc/systemd/system/
-    install -D -m644 etc/slurmd.service /etc/systemd/system/
-    systemctl daemon-reload
+
+    install -D -m744 etc/init.d.slurmdbd /etc/init.d/slurmdbd
+    install -D -m744 etc/init.d.slurm /etc/init.d/slurm
+
     mkdir /opt/slurm/etc
     cp etc/cgroup.conf.example /opt/slurm/etc/cgroup.conf
+    printf "\nCgroupMountpoint=/cgroup\n" >> /opt/slurm/etc/cgroup.conf
     mkdir /var/spool/slurmd
 fi
 
