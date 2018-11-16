@@ -9,14 +9,14 @@ systemctl start munge
 # Install SLURM
 yum -y install readline-devel numactl-devel pam-devel glib2-devel hwloc-devel openssl-devel curl-devel libcgroup-devel
 cd /tmp
-if [ ! -f /tmp/slurm-17.11.7.tar.bz2 ]; then
-    curl -o slurm-17.11.7.tar.bz2 https://download.schedmd.com/slurm/slurm-17.11.7.tar.bz2
+if [ ! -f /tmp/slurm-18.08.3.tar.bz2 ]; then
+    curl -o slurm-18.08.3.tar.bz2 https://download.schedmd.com/slurm/slurm-18.08.3.tar.bz2
 fi
-if [ ! -d /tmp/slurm-17.11.7 ]; then
-    tar xf slurm-17.11.7.tar.bz2
+if [ ! -d /tmp/slurm-18.08.3 ]; then
+    tar xf slurm-18.08.3.tar.bz2
 fi
 if [ ! -f /opt/slurm/sbin/slurmctld ]; then
-    cd slurm-17.11.7
+    cd slurm-18.08.3
     ./configure --prefix=/opt/slurm --sysconfdir=/opt/slurm/etc
     make
     make install
