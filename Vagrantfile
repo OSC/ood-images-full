@@ -35,10 +35,18 @@ Vagrant.configure(2) do |config|
   end
   config.vm.define "auth", primary: false, autostart: true do |auth|
     auth.vm.network "private_network", ip: "10.0.0.102"
-    auth.vm.provision "shell", path: "keycloak-setup.sh"
     auth.vm.provision "shell", inline: "hostnamectl set-hostname auth"
     auth.vm.provision "shell", inline: "cp -f /vagrant/hosts /etc/hosts"
+    auth.vm.provision "shell", inline: "systemctl enable httpd24-httpd"
+    auth.vm.provision "shell", inline: "systemctl start httpd24-httpd"
+    auth.vm.provision "shell", path: "keycloak-setup.sh"
+    auth.vm.provision "shell", inline: "systemctl daemon-reload"
     auth.vm.provision "shell", inline: "systemctl enable keycloak"
+    auth.vm.provision "shell", inline: "systemctl start keycloak"
+    auth.vm.provision "shell", path: "oidc-configure.sh"
+    auth.vm.provision "shell", inline: "systemctl stop keycloak"
+    auth.vm.provision "shell", inline: "systemctl stop httpd24-httpd"
+    auth.vm.provision "shell", inline: "systemctl start httpd24-httpd"
     auth.vm.provision "shell", inline: "systemctl start keycloak"
   end
 end

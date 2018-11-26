@@ -1,0 +1,74 @@
+{
+  "id": "ondemand",
+  "realm": "ondemand",
+  "clients": [{
+      "clientId": "localhost",
+      "enabled": true,
+      "baseUrl": "http://localhost:8080",
+      "redirectUris": [
+        "http://localhost:8080/oidc",
+        "http://localhost:8080"
+      ],
+      "adminUrl": "http://localhost:8080",
+      "fullScopeAllowed": true,
+      "protocolMappers": [
+        {
+          "protocolMapper" : "oidc-usermodel-property-mapper",
+          "protocol" : "openid-connect",
+          "name" : "username",
+          "config" : {
+            "Claim JSON Type" : "String",
+            "user.attribute" : "username",
+            "claim.name" : "preferred_username",
+            "id.token.claim" : "true",
+            "access.token.claim" : "true"
+          }
+        },
+        {
+          "protocolMapper" : "oidc-full-name-mapper",
+          "protocol" : "openid-connect",
+          "name" : "full name",
+          "config" : {
+            "id.token.claim" : "true",
+            "access.token.claim" : "true"
+          }
+        },
+        {
+          "protocolMapper" : "oidc-usermodel-property-mapper",
+          "protocol" : "openid-connect",
+          "name" : "given name",
+          "config" : {
+            "Claim JSON Type" : "String",
+            "user.attribute" : "firstName",
+            "claim.name" : "given_name",
+            "id.token.claim" : "true",
+            "access.token.claim" : "true"
+          }
+        },
+        {
+          "protocolMapper" : "oidc-usermodel-property-mapper",
+          "protocol" : "openid-connect",
+          "name" : "family name",
+          "config" : {
+            "Claim JSON Type" : "String",
+            "user.attribute" : "lastName",
+            "claim.name" : "family_name",
+            "id.token.claim" : "true",
+            "access.token.claim" : "true"
+          }
+        },
+        {
+          "protocolMapper" : "oidc-usermodel-property-mapper",
+          "protocol" : "openid-connect",
+          "name" : "email",
+          "config" : {
+            "Claim JSON Type" : "String",
+            "user.attribute" : "email",
+            "claim.name" : "email",
+            "id.token.claim" : "true",
+            "access.token.claim" : "true"
+          }
+        }
+      ]
+  }]
+}
