@@ -15,6 +15,7 @@ Vagrant.configure(2) do |config|
       yum install -y ondemand
     SHELL
     ood.vm.provision "shell", path: "ood-setup.sh"
+    ood.vm.provision "shell", inline: "systemctl enable httpd24-httpd"
     ood.vm.provision "shell", inline: "systemctl start httpd24-httpd"
     ood.vm.provision "shell", inline: "hostnamectl set-hostname ood"
     ood.vm.provision "shell", inline: "cp -f /vagrant/hosts /etc/hosts"
@@ -27,7 +28,9 @@ Vagrant.configure(2) do |config|
     head.vm.provision "shell", inline: "hostnamectl set-hostname head"
     head.vm.provision "shell", inline: "cp -f /vagrant/hosts /etc/hosts"
     head.vm.provision "shell", path: "slurm-setup.sh"
+    head.vm.provision "shell", inline: "systemctl enable slurmd"
     head.vm.provision "shell", inline: "systemctl start slurmd"
+    head.vm.provision "shell", inline: "systemctl enable slurmctld"
     head.vm.provision "shell", inline: "systemctl start slurmctld"
   end
 end

@@ -4,6 +4,7 @@
 yum -y install epel-release
 yum -y install munge munge-devel
 install -o munge -g munge -m 0600 /vagrant/munge.key /etc/munge/munge.key
+systemctl enable munge
 systemctl start munge
 
 # Install SLURM

@@ -1,6 +1,6 @@
 # Setup
 
-    git clone https://github.com/treydock/ood-images-full.git
+    git clone https://github.com/OSC/ood-images-full.git
     cd ood-images-full
     vagrant plugin install vagrant-vbguest
 
