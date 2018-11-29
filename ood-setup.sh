@@ -1,12 +1,9 @@
 #!/bin/bash
 
-# Disable SELinux unless running in docker container or it's disabled
-getenforce | grep -q Disabled
-if [ ! -f /.dockerenv -a $? -ne 0 ]; then
-    setenforce 0
-    sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux
-    sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
-fi
+# Disable SELinux
+setenforce 0
+sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux
+sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
 
 # Add user to system and apache basic auth
 groupadd ood

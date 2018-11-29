@@ -3,3 +3,5 @@ ood-home/*
 ood-home/.ssh/known_hosts
 !ood-home/.ssh
 !ood-home/.bashrc
+slurm/*
+!slurm/.keep

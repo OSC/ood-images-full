@@ -8,8 +8,8 @@
 
 Launch and setup the VMs:
 
-    vagrant up ood
     vagrant up head
+    vagrant up ood
 
 # Usage
 
