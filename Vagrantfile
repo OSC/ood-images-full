@@ -11,7 +11,11 @@ Vagrant.configure(2) do |config|
     ood.vm.network "private_network", ip: "10.0.0.100"
     ood.vm.provision "shell", inline: <<-SHELL
       yum install -y centos-release-scl lsof sudo
-      yum install -y https://yum.osc.edu/ondemand/1.3/ondemand-release-web-1.3-1.el7.noarch.rpm
+      # curl without status bar
+      # grep the HTML (...I know...)
+      # grab the latest
+      LATEST_OOD=$(curl -s https://yum.osc.edu/ondemand/latest/web/el7/x86_64/ | grep -Eo 'ondemand-[0-9][^"]+rpm' | sort | uniq | tail -n1)
+      yum install -y "https://yum.osc.edu/ondemand/latest/web/el7/x86_64/$LATEST_OOD"
       yum install -y ondemand
     SHELL
     ood.vm.provision "shell", path: "ood-setup.sh"
