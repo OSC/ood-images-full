@@ -74,6 +74,7 @@ Vagrant.configure(2) do |config|
       yum install -y centos-release-scl lsof sudo
       yum install -y "#{get_ood_selected_version}"
       yum install -y ondemand
+      yum update -y
     SHELL
     ood.vm.provision "shell", path: "ood-setup.sh"
     ood.vm.provision "shell", inline: "systemctl enable httpd24-httpd"
@@ -85,6 +86,7 @@ Vagrant.configure(2) do |config|
   end
   config.vm.define "head", primary: false, autostart: true do |head|
     head.vm.network "private_network", ip: "10.0.0.101"
+    head.vm.provision "shell", inline: "yum update -y"
     head.vm.provision "shell", path: "head-setup.sh"
     head.vm.provision "shell", inline: "hostnamectl set-hostname head"
     head.vm.provision "shell", inline: "cp -f /vagrant/hosts /etc/hosts"
