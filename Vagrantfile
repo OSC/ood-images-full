@@ -45,13 +45,18 @@ def get_ood_selected_version
     return default
   end
 
+  re = /[1-9][0-9]*(\.[0-9]+){1,2}(-[0-9]+)?/
+
   case env_selected
   when 'latest'
     selected = "https://yum.osc.edu/ondemand/latest/web/el7/x86_64/#{latest.last}"
   when 'public'
     selected = "https://yum.osc.edu/ondemand/#{current}/web/el7/x86_64/#{released.last}"
-  when /[1-9][0-9]*(\.[0-9]+){1,2}(-[0-9]+)?/  # e.g. 1.3.6-1
-    selected = get_rpm_url(current, released.find {|rpm| rpm.include?(env_selected)}) || get_rpm_url(current, latest.find {|rpm| rpm.include?(env_selected)})
+  when re  # e.g. 1.3.6-1
+    version = released.find {|rpm| rpm.include?(env_selected)} || latest.find {|rpm| rpm.include?(env_selected)}
+    prefix = /[1-9][0-9]*\.[0-9]+/.match(version)[0]
+    dir = (prefix == current) ? current : 'latest'
+    selected = get_rpm_url(dir, re.match(version)[0])
   end
 
   if selected.nil?
@@ -61,6 +66,8 @@ def get_ood_selected_version
 
   selected
 end
+
+# https://yum.osc.edu/ondemand/1.3/web/el7/x86_64/ondemand-ondemand-1.4.3-2.el7.x86_64.rpm.el7.x86_64.rpm. Skipping.
 
 Vagrant.configure(2) do |config|
   config.vm.box = "centos/7"
