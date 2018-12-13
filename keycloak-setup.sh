@@ -81,21 +81,3 @@ EOF
 # EOF
 #
 # sudo iptables -I INPUT -p tcp -m multiport --dports 8443 -m comment --comment "08443 *:8443" -j ACCEPT
-
-# Add a new realm
-cd bin
-./kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user admin  --password KEYCLOAKPASS
-./kcadm.sh create realms -s realm=ondemand -s enabled=true -s loginWithEmailAllowed=false -s rememberMe=true
-
-# Configure LDAP
-REALMID=$(./kcadm.sh get realms/ondemand --fields id | egrep -v '{|}' | sed 's/.*id".*:\s*"//g; s/"//g')
-./kcadm.sh create components -r ondemand -s name=ldap -s providerId=ldap -s providerType=org.keycloak.storage.UserStorageProvider -s parentId=$REALMID  -s 'config.importUsers=["false"]'   -s 'config.priority=["1"]' -s 'config.fullSyncPeriod=["-1"]' -s 'config.changedSyncPeriod=["-1"]' -s 'config.cachePolicy=["DEFAULT"]' -s config.evictionDay=[] -s config.evictionHour=[] -s config.evictionMinute=[] -s config.maxLifespan=[] -s 'config.batchSizeForSync=["1000"]'  -s 'config.editMode=["READ_ONLY"]'  -s 'config.syncRegistrations=["false"]'  -s 'config.vendor=["other"]'  -s 'config.usernameLDAPAttribute=["uid"]' -s 'config.rdnLDAPAttribute=["uid"]' -s 'config.uuidLDAPAttribute=["entryUUID"]'  -s 'config.userObjectClasses=["posixAccount"]' -s 'config.connectionUrl=["ldaps://openldap1.infra.osc.edu:636 ldaps://openldap2.infra.osc.edu:636"]' -s 'config.usersDn=["ou=People,ou=hpc,o=osc"]'  -s 'config.authType=["simple"]'  -s 'config.bindDn=["uid=admin,ou=system"]' -s 'config.bindCredential=["secret"]'  -s 'config.useTruststoreSpi=["never"]'  -s 'config.connectionPooling=["true"]' -s 'config.pagination=["true"]'
-
-# Add OnDemand as a client
-CID=$(./kcadm.sh create clients -r ondemand -f /vagrant/ondemand-clients.json -s clientId=localhost  -s enabled=true -s fullScopeAllowed=true -s 'redirectUris=["http://localhost:8080/oidc http://localhost:8080"]' -i)
-
-# Add Custom Theme
-cd ../themes
-curl -LOk  https://github.com/OSC/keycloak-theme/archive/v0.0.1.zip
-unzip v0.0.1.zip
-../bin/kcadm.sh update realms/ondemand -s "loginTheme=keycloak-theme-0.0.1"

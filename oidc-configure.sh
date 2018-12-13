@@ -1,4 +1,21 @@
 #!/bin/bash
+# Add a new realm
+cd /opt/keycloak-4.5.0.Final/bin/
+./kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user admin  --password KEYCLOAKPASS
+./kcadm.sh create realms -s realm=ondemand -s enabled=true -s loginWithEmailAllowed=false -s rememberMe=true
+
+# Configure LDAP
+REALMID=$(./kcadm.sh get realms/ondemand --fields id | egrep -v '{|}' | sed 's/.*id".*:\s*"//g; s/"//g')
+./kcadm.sh create components -r ondemand -s name=ldap -s providerId=ldap -s providerType=org.keycloak.storage.UserStorageProvider -s parentId=$REALMID  -s 'config.importUsers=["false"]'   -s 'config.priority=["1"]' -s 'config.fullSyncPeriod=["-1"]' -s 'config.changedSyncPeriod=["-1"]' -s 'config.cachePolicy=["DEFAULT"]' -s config.evictionDay=[] -s config.evictionHour=[] -s config.evictionMinute=[] -s config.maxLifespan=[] -s 'config.batchSizeForSync=["1000"]'  -s 'config.editMode=["READ_ONLY"]'  -s 'config.syncRegistrations=["false"]'  -s 'config.vendor=["other"]'  -s 'config.usernameLDAPAttribute=["uid"]' -s 'config.rdnLDAPAttribute=["uid"]' -s 'config.uuidLDAPAttribute=["entryUUID"]'  -s 'config.userObjectClasses=["posixAccount"]' -s 'config.connectionUrl=["ldaps://openldap1.infra.osc.edu:636 ldaps://openldap2.infra.osc.edu:636"]' -s 'config.usersDn=["ou=People,ou=hpc,o=osc"]'  -s 'config.authType=["simple"]'  -s 'config.bindDn=["uid=admin,ou=system"]' -s 'config.bindCredential=["secret"]'  -s 'config.useTruststoreSpi=["never"]'  -s 'config.connectionPooling=["true"]' -s 'config.pagination=["true"]'
+
+# Add OnDemand as a client
+CID=$(./kcadm.sh create clients -r ondemand -f /vagrant/ondemand-clients.json -s clientId=localhost  -s enabled=true -s fullScopeAllowed=true -s accessType=confidential -s directAccessGrantsEnabled=false -i)
+
+# Add Custom Theme
+cd ../themes
+curl -LOk  https://github.com/OSC/keycloak-theme/archive/v0.0.1.zip
+unzip v0.0.1.zip
+../bin/kcadm.sh update realms/ondemand -s "loginTheme=keycloak-theme-0.0.1"
 
 # Install dependencies for building mod_auth_openidc
 yum install httpd24-httpd-devel openssl-devel curl-devel jansson-devel pcre-devel autoconf automake
@@ -62,10 +79,14 @@ EOF
 sudo /opt/ood/ood-portal-generator/sbin/update_ood_portal
 
 # Update openid config file
+cd /opt/keycloak-4.5.0.Final/bin/
+RAND=$(openssl rand -hex 20)
+ID=$(./kcadm.sh get clients -r ondemand --fields id -q clientId=localhost | egrep -v '{|}' | sed 's/.*id".*:\s*"//g; s/"//g')
+SECRET=$(./kcadm.sh get clients/$ID/client-secret -r ondemand | egrep -v '{|,|}' | sed 's/.*value".*:\s*"//g; s/"//g')
 sudo cat > /opt/rh/httpd24/root/etc/httpd/conf.modules.d/auth_openidc.conf <<EOF
 OIDCProviderMetadataURL https://localhost:8080/auth/realms/ondemand/.well-known/openid-configuration
 OIDCClientID        "localhost"
-OIDCClientSecret    "1111111-1111-1111-1111-111111111111"
+OIDCClientSecret    "1111111-1111-1111-1111-1111111111111"
 OIDCRedirectURI      https://localhost:8080/oidc
 OIDCCryptoPassphrase "4444444444444444444444444444444444444444"
 
@@ -88,7 +109,8 @@ EOF
 # OIDCClientSecret: replace 1111111-1111-1111-1111-1111111111111 with client secret specified from the Install tab of the client in Keycloak admin interface
 # OIDCCryptoPassphrase: replace 4444444444444444444444444444444444444444 with random generated password. I used openssl rand -hex 20.
 # Verify the OIDCProviderMetadataURL uses the correct realm and the port Apache exposes to the world for Keycloak by accessing the URL.
-
+sudo sed -i -e"s/^OIDCClientSecret.*/OIDCClientSecret    \"$SECRET\"/"  /opt/rh/httpd24/root/etc/httpd/conf.modules.d/auth_openidc.conf
+sudo sed -i -e"s/^OIDCCryptoPassphrase.*/OIDCCryptoPassphrase   \"$RAND\"/"  /opt/rh/httpd24/root/etc/httpd/conf.modules.d/auth_openidc.conf
 
 # Change permission on file to be readable by apache and no one else:
 sudo chgrp apache /opt/rh/httpd24/root/etc/httpd/conf.d/auth_openidc.conf
