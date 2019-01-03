@@ -10,7 +10,7 @@ Vagrant.configure(2) do |config|
     ood.vm.network "forwarded_port", guest: 80, host: 8080
     ood.vm.network "private_network", ip: "10.0.0.100"
     ood.vm.provision "shell", inline: <<-SHELL
-      yum install -y centos-release-scl lsof sudo
+      yum install -y epel-release centos-release-scl lsof sudo
       yum install -y https://yum.osc.edu/ondemand/latest/ondemand-release-web-latest-1-2.el7.noarch.rpm
       yum install -y ondemand
     SHELL
