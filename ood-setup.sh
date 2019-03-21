@@ -1,10 +1,8 @@
 #!/bin/bash
 
 # Install new OOD Portal config
-rm -f /etc/ood/config/ood_portal.yml
-cp /vagrant/ood_portal.yml /etc/ood/config/ood_portal.yml
+cp -f /vagrant/ood_portal.yml /etc/ood/config/ood_portal.yml
 /opt/ood/ood-portal-generator/sbin/update_ood_portal
-systemctl try-restart httpd24-httpd.service httpd24-htcacheclean.service
 
 # Disable SELinux
 setenforce 0
