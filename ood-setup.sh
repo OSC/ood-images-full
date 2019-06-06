@@ -2,7 +2,7 @@
 
 # Install new OOD Portal config
 cp -f /vagrant/ood_portal.yml /etc/ood/config/ood_portal.yml
-/opt/ood/ood-portal-generator/sbin/update_ood_portal
+scl enable rh-ruby24 -- /opt/ood/ood-portal-generator/sbin/update_ood_portal
 
 # Disable SELinux
 setenforce 0

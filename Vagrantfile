@@ -11,9 +11,10 @@ Vagrant.configure(2) do |config|
     ood.vm.network "private_network", ip: "10.0.0.100"
     ood.vm.provision "shell", inline: <<-SHELL
       yum install -y epel-release centos-release-scl lsof sudo
-      yum install -y https://yum.osc.edu/ondemand/latest/ondemand-release-web-latest-1-2.el7.noarch.rpm
-      yum install -y ondemand
+      # yum install -y https://yum.osc.edu/ondemand/latest/ondemand-release-web-latest-1-2.el7.noarch.rpm
+      # yum install -y ondemand
     SHELL
+    ood.vm.provision "shell", path: "install-ondemand-from-src.sh"
     ood.vm.provision "shell", path: "ood-setup.sh"
     ood.vm.provision "shell", inline: "systemctl enable httpd24-httpd"
     ood.vm.provision "shell", inline: "systemctl start httpd24-httpd"
